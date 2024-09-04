@@ -46,13 +46,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 10,
-    gap: 10,
+    gap: 20,
+    alignContent: 'center',
   },
   pokemonContainer: {
     borderWidth: 1,
-    borderColor: 'black',
+    borderColor: 'blue',
     padding: 10,
     borderRadius: 10,
+    
   },
   text: {
     fontSize: 16,
