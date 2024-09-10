@@ -1,62 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import { Link } from 'expo-router';
 
-interface Pokemon {
-  name: string;
-  url: string;
-}
+export default function Index() {
+    return (
+        <View style={styles.container}>
+            <Text style={styles.title}>Bienvenido a Instagram</Text>
 
-export default function Page() {
-  const [listPokemons, setListPokemons] = useState([] as Pokemon[]);
+            {/* Contenedor para el botón de Iniciar Sesión */}
+            <View style={styles.buttonContainer}>
+                <Link href={"/singup"} asChild>
+                    <Button
+                        title="Iniciar Sesión"
+                        color="#3897f0"
+                    />
+                </Link>
+            </View>
 
-  useEffect(() => {
-    callAPi();
-  }, []);
-
-  useEffect(() => {
-    console.log({ listPokemons });
-  }, [listPokemons]);
-
-  const callAPi = async () => {
-    try {
-      const response = await fetch('https://pokeapi.co/api/v2/pokemon?limit=10');
-      const data = await response.json();
-      setListPokemons(data.results);
-      console.log({
-        response,
-        data
-      });
-    } catch (error) {
-      console.log('hay un error: ', error);
-    }
-  };
-
-  return (
-    <View style={styles.container}>
-      {listPokemons.map((pokemon, index) => (
-        <View key={index} style={styles.pokemonContainer}>
-          <Text style={styles.text}>{pokemon.name}</Text>
+            {/* Contenedor para el botón de Registrarse */}
+            <View style={styles.buttonContainer}>
+                <Link href={"/singin"} asChild>
+                    <Button
+                        title="Registrarse"
+                        color="#42b72a"
+                    />
+                </Link>
+            </View>
         </View>
-      ))}
-    </View>
-  );
+    );
 }
+
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 10,
-    gap: 20,
-    alignContent: 'center',
-  },
-  pokemonContainer: {
-    borderWidth: 1,
-    borderColor: 'blue',
-    padding: 10,
-    borderRadius: 10,
-    
-  },
-  text: {
-    fontSize: 16,
-  },
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 20,
+        paddingVertical: 40,
+        backgroundColor: "#f9f9f9"
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 40
+        
+    },
+    buttonContainer: {
+        marginTop: 20,
+        width: '80%',
+        height: 50,
+        borderRadius: 30
+    }
 });
