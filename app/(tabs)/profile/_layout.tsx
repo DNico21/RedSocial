@@ -8,7 +8,7 @@ export default function ProfileLayout() {
   return (
     <Stack>
       <Stack.Screen
-        name="profile"
+        name="index"
         options={{
           title: "Instagram",
           headerRight: () => (

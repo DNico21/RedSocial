@@ -4,7 +4,7 @@ import React from 'react'
 export default function reels() {
   return (
     <View>
-      <Text>reels</Text>
+      <Text>Reels</Text>
     </View>
   )
 }
