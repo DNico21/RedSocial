@@ -1,8 +1,18 @@
 import { View, Text, StyleSheet, TextInput, Button } from 'react-native'
-import React from 'react'
+import React, { useContext, useState } from 'react'
 import { Link } from 'expo-router'
 
+
 export default function Singup() {
+
+
+    const { signUp } = useContext(AuthContext)
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+
+
+
     return (
         <View style={styles.container}>
             <View style={styles.textContainer}>
