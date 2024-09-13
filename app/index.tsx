@@ -1,3 +1,4 @@
+//index.tsx
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
 
@@ -8,7 +9,7 @@ export default function Index() {
 
             {/* Contenedor para el botón de Iniciar Sesión */}
             <View style={styles.buttonContainer}>
-                <Link href={"/singup"} asChild>
+                <Link href={"/singin"} asChild>
                     <Button
                         title="Iniciar Sesión"
                         color="#3897f0"
@@ -18,7 +19,7 @@ export default function Index() {
 
             {/* Contenedor para el botón de Registrarse */}
             <View style={styles.buttonContainer}>
-                <Link href={"/singin"} asChild>
+                <Link href={"/singup"} asChild>
                     <Button
                         title="Registrarse"
                         color="#42b72a"

@@ -1,44 +1,68 @@
-import { createContext, useReducer } from "react";
-import { AuthReducer, AuthState } from "./AuthReducer";
-import Singup from "@/app/singup";
+//AuthContext.tsx
 
-const defaultValues: AuthState = {
+import { createContext, useEffect, useReducer } from "react";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "@/utils/firebaseConfig";
+import { authReducer } from "./AuthReducer";
+
+export interface AuthState {
+  user?: any;
+}
+
+const authStateDefault = {
   user: undefined,
-  isLogged: false,
 };
 
 interface AuthContextProps {
   state: AuthState;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string) => Promise<boolean>;
+  signIn: (email: string, password: string) => Promise<boolean>;
 }
 
-const AuthContext = createContext({});
+export const AuthContext = createContext({} as AuthContextProps);
 
-export const AuthProvider = ({ children }: any) => {
-  const [state, dispatch] = useReducer(AuthReducer, defaultValues);
+export function AuthProvider({ children }: any) {
+  const [state, dispatch] = useReducer(authReducer, authStateDefault);
 
-  const login = async (email: String, password: String) => {
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        dispatch({ type: "login", payload: user });
+      }
+    });
+    return unsubscribe;
+  }, []);
+
+  const signIn = async (email: string, password: string): Promise<boolean> => {
     try {
-      const response = { name: "" };
-      dispatch({
-        type: "LOGIN",
-        payload: response,
-      });
-    } catch (error) {
-      console.log(error);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      dispatch({ type: "login", payload: userCredential.user });
+      return true;
+    } catch (error: any) {
+      console.log("Error al iniciar sesión:", error.message);
+      return false;
     }
   };
 
-  const signUp = async (email: String, password: String) => {
+  const signUp = async (email: string, password: string): Promise<boolean> => {
     try {
-      const response = { name: "" };
-      dispatch({
-        type: "LOGIN",
-        payload: response,
-      });
-    } catch (error) {
-      console.log(error);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      dispatch({ type: "login", payload: userCredential.user });
+      return true;
+    } catch (error: any) {
+      console.log("Error al registrarse:", error.message);
+      return false;
     }
   };
 
@@ -46,11 +70,11 @@ export const AuthProvider = ({ children }: any) => {
     <AuthContext.Provider
       value={{
         state,
-        login,
-        Singup,
+        signIn,
+        signUp,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
-};
+}

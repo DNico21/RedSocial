@@ -4,7 +4,7 @@ export default function ReelsLayout() {
   return (
     <Stack>
       <Stack.Screen
-        name="reels"
+        name="index"
         options={{
           title: "Instagram",
         }}

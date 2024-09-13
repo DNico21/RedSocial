@@ -1,33 +1,18 @@
-import { useReducer } from "react"
+//AuthReducer.ts
 
+import { AuthState } from "./AuthContext";
 
+type ActionsProps = { type: "login", payload: any }
 
-export interface AuthState{
-    user?:any,
-    isLogged: boolean,
-}
+export const authReducer = (state: AuthState, actions: ActionsProps): AuthState => {
 
-
-type ActionsProps = {type:"LOGIN", payload: any} | {type:"LOGOUT"}
-
-
-export const AuthReducer = (state: any, actions:any)=>{
-
-    
-
-    switch(actions.type){
-        case "LOGIN":
-            return{
+    switch (actions.type) {
+        case 'login':
+            return {
                 ...state,
-                user: undefined,
-                isLogged: true
+                user: actions.payload
             }
-            case "LOGOUT":
-            return{
-                ...state,
-                user: undefined
-            }
-            default:
-                return state
-        }
+        default:
+            return state
+    }
 }

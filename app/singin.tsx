@@ -1,52 +1,57 @@
-import { View, Text, StyleSheet, TextInput, Button } from 'react-native'
-import React from 'react'
-import { Link } from 'expo-router';
+//singin.tsx
+import { View, Text, StyleSheet, TextInput, Button } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { Link, router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AuthContext } from '@/context/AuthContext';
 
-export default function Singin() {
+export default function SignIn() {
+    const insets = useSafeAreaInsets();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const {signIn} = useContext(AuthContext);
+
+    async function handleLogin() {
+        const response = await signIn(email, password);
+        if (response) {
+            router.replace('/(tabs)/home');
+        } else {
+            console.log('Hubo un error ingresando');
+        }
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.textContainer}>
-                <Text style={styles.title}>Registrarse</Text>
+                <Text style={styles.title}>Iniciar sesión</Text>
             </View>
 
-            {/* Contenedor para el campo de Email */}
             <View style={styles.inputContainer}>
                 <TextInput
                     placeholder="Email"
                     style={styles.input}
+                    value={email}
+                    onChangeText={setEmail} // Aquí usamos el estado
                 />
             </View>
 
-            {/* Contenedor para el campo de Nombre de usuario */}
-            <View style={styles.inputContainer}>
-                <TextInput
-                    placeholder="Nombre de Usuario"
-                    style={styles.input}
-                />
-            </View>
-
-            {/* Contenedor para el campo de Contraseña */}
             <View style={styles.inputContainer}>
                 <TextInput
                     placeholder="Contraseña"
                     secureTextEntry={true}
                     style={styles.input}
+                    value={password}
+                    onChangeText={setPassword} // Aquí también
                 />
             </View>
 
-            {/* Contenedor para el campo de confirmar Contraseña */}
-            <View style={styles.inputContainer}>
-                <TextInput
-                    placeholder="Confirmar Contraseña"
-                    secureTextEntry={true}
-                    style={styles.input}
-                />
-            </View>
-
-            {/* Contenedor para el botón de registrarse */}
             <View style={styles.buttonContainer}>
-                <Link href={"/(tabs)/home"} asChild>
-                    <Button title='Ingresar' />
+                <Button title="Ingresar" onPress={handleLogin} />
+            </View>
+
+            <View style={styles.linkContainer}>
+                <Link href="/singup">
+                    <Text style={styles.linkText}>¿No tienes una Cuenta? - Crea una cuenta</Text>
                 </Link>
             </View>
         </View>
@@ -61,15 +66,15 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     textContainer: {
-        marginBottom: 30, // Espaciado antes de los campos
+        marginBottom: 30,
     },
     title: {
         fontWeight: 'bold',
         fontSize: 24,
     },
     inputContainer: {
-        marginVertical: 10, // Espaciado entre los campos de entrada
-        width: '80%', // Ajustar el ancho de los inputs
+        marginVertical: 10,
+        width: '80%',
     },
     input: {
         padding: 10,
@@ -79,8 +84,14 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
     buttonContainer: {
-        marginTop: 20, // Espaciado antes del botón
-        width: '80%', // Ajustar el ancho del botón
-        height: 70
+        marginTop: 20,
+        width: '80%',
+    },
+    linkContainer: {
+        marginTop: 20,
+    },
+    linkText: {
+        color: 'blue',
+        textDecorationLine: 'underline',
     },
 });
