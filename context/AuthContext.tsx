@@ -1,12 +1,9 @@
 //AuthContext.tsx
-
 import { createContext, useEffect, useReducer } from "react";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { auth } from "@/utils/firebaseConfig";
+import {createUserWithEmailAndPassword, signInWithEmailAndPassword} from "firebase/auth";
+import { auth, db } from "@/utils/firebaseConfig";
 import { authReducer } from "./AuthReducer";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export interface AuthState {
   user?: any;
@@ -18,7 +15,7 @@ const authStateDefault = {
 
 interface AuthContextProps {
   state: AuthState;
-  signUp: (email: string, password: string) => Promise<boolean>;
+  signUp: (email: string, password: string, firstname:String, lastname: String) => Promise<boolean>;
   signIn: (email: string, password: string) => Promise<boolean>;
 }
 
@@ -43,25 +40,52 @@ export function AuthProvider({ children }: any) {
         email,
         password
       );
-      dispatch({ type: "login", payload: userCredential.user });
+      const docRef = doc(db, "Users", userCredential.user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+      } else {
+        console.log("No such document!");
+      }
       return true;
     } catch (error: any) {
-      console.log("Error al iniciar sesión:", error.message);
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log("Error: ", {
+        errorCode,
+        errorMessage,
+      });
       return false;
     }
   };
 
-  const signUp = async (email: string, password: string): Promise<boolean> => {
+  const signUp = async (email: string, password: string, firstname:String, lastname: String): Promise<boolean> => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(
+      const response = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      dispatch({ type: "login", payload: userCredential.user });
+      // Obtener el UID del usuario recién creado
+      const user = response.user;
+      const uid = user.uid;
+
+      // Guardar los datos del usuario en Firestore
+      await setDoc(doc(db, "Users", uid), {
+        firstname,
+        lastname,
+        email,
+      });
+
       return true;
     } catch (error: any) {
-      console.log("Error al registrarse:", error.message);
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log("Error: ", {
+        errorCode,
+        errorMessage,
+      });
       return false;
     }
   };

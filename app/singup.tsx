@@ -9,22 +9,24 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
 
   const handleSignUp = async () => {
     if (password !== confirmPassword) {
       Alert.alert("Error", "Las contraseñas no coinciden");
-      router.replace('/(tabs)/home');
+      router.replace("/(tabs)/home");
       return;
     }
 
-    const response = await signUp(email, password);
+    const response = await signUp(email, password, firstname, lastname);
     if (response) {
       Alert.alert("Éxito", "Cuenta creada con éxito");
 
       // Iniciar sesión automáticamente
       const loginResponse = await signIn(email, password);
       if (loginResponse) {
-        router.replace("/(tabs)/home"); // Navegamos a la pantalla home
+        router.replace("/(tabs)/home");
       } else {
         Alert.alert("Error", "Hubo un error al iniciar sesión");
       }
@@ -42,6 +44,7 @@ export default function SignUp() {
       {/* Campo de Email */}
       <View style={styles.inputContainer}>
         <TextInput
+          autoCapitalize="none"
           placeholder="Email"
           style={styles.input}
           value={email}
@@ -49,9 +52,32 @@ export default function SignUp() {
         />
       </View>
 
+      {/* Campo de Nombre */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          autoCapitalize="none"
+          placeholder="Nombre"
+          style={styles.input}
+          value={firstname}
+          onChangeText={setFirstname} // Actualiza el estado con el valor de email
+        />
+      </View>
+
+      {/* Campo de Nombre */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          autoCapitalize="none"
+          placeholder="Apellido"
+          style={styles.input}
+          value={lastname}
+          onChangeText={setLastname} // Actualiza el estado con el valor de email
+        />
+      </View>
+
       {/* Campo de Contraseña */}
       <View style={styles.inputContainer}>
         <TextInput
+          autoCapitalize="none"
           placeholder="Contraseña"
           secureTextEntry={true}
           style={styles.input}
@@ -63,6 +89,7 @@ export default function SignUp() {
       {/* Confirmar Contraseña */}
       <View style={styles.inputContainer}>
         <TextInput
+          autoCapitalize="none"
           placeholder="Confirmar Contraseña"
           secureTextEntry={true}
           style={styles.input}

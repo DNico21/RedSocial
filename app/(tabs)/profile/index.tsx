@@ -1,36 +1,53 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { Link } from 'expo-router';
 
 export default function Profile() {
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
-        {/* Imagen de perfil */}
         <Image
-          source={{ uri: "https://via.placeholder.com/80" }} // URL de la imagen de perfil
+          source={{ uri: "https://via.placeholder.com/80" }}
           style={styles.profileImage}
         />
 
-        {/* Nombre de usuario */}
         <View style={styles.textContainer}>
           <Text style={styles.username}>##</Text>
           <Text style={styles.username}>Publicaciones</Text>
         </View>
+
         <View style={styles.textContainer}>
           <Text style={styles.username}>##</Text>
           <Text style={styles.username}>Seguidores</Text>
         </View>
+
         <View style={styles.textContainer}>
           <Text style={styles.username}>##</Text>
-          <Text style={styles.username}>Seguidos </Text>
+          <Text style={styles.username}>Seguidos</Text>
         </View>
       </View>
+
       <View>
         <Text>Nombre de usuario</Text>
         <Text>Descripción</Text>
       </View>
+
+      <View style={styles.buttonContainer}>
+        <Link href="/(tabs)/profile/editprofile" asChild>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Editar perfil</Text>
+          </TouchableOpacity>
+        </Link>
+
+        <Link href="/(tabs)/profile/configuration" asChild>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Ajustes</Text>
+          </TouchableOpacity>
+        </Link>
+      </View>
+
       <View style={styles.publicacionesContainer}>
-        <Text>Publiaciones</Text>
+        <Text>Publicaciones</Text>
       </View>
     </View>
   );
@@ -66,5 +83,20 @@ const styles = StyleSheet.create({
   publicacionesContainer:{
     alignContent: "center",
     alignItems: "center"
+  },
+  buttonContainer: {
+    flexDirection: "row", // Pone los botones en fila
+    justifyContent: "space-around", // Espacio alrededor de los botones
+    marginVertical: 20,
+  },
+  button: {
+    backgroundColor: "#2196F3", // Color del botón
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20, // Esquinas redondeadas
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
