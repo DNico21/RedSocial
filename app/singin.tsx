@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, Button } from 'react-native';
 import React, { useContext, useState } from 'react';
 import { Link, router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AuthContext } from '@/context/AuthContext';
+import { AuthContext } from '@/context/authContext/AuthContext';
 
 export default function SignIn() {
     const insets = useSafeAreaInsets();

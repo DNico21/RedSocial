@@ -2,7 +2,7 @@
 import { View, Text, StyleSheet, TextInput, Button, Alert } from "react-native";
 import React, { useContext, useState } from "react";
 import { Link, router } from "expo-router";
-import { AuthContext } from "@/context/AuthContext";
+import { AuthContext } from "@/context/authContext/AuthContext";
 
 export default function SignUp() {
   const { signUp, signIn } = useContext(AuthContext);

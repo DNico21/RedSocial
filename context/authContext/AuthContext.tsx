@@ -1,4 +1,3 @@
-//AuthContext.tsx
 import { createContext, useEffect, useReducer } from "react";
 import {createUserWithEmailAndPassword, signInWithEmailAndPassword} from "firebase/auth";
 import { auth, db } from "@/utils/firebaseConfig";
@@ -15,7 +14,7 @@ const authStateDefault = {
 
 interface AuthContextProps {
   state: AuthState;
-  signUp: (email: string, password: string, firstname:String, lastname: String) => Promise<boolean>;
+  signUp: (email: string, password: string, firstname: string, lastname: string) => Promise<boolean>;
   signIn: (email: string, password: string) => Promise<boolean>;
 }
 
@@ -25,9 +24,16 @@ export function AuthProvider({ children }: any) {
   const [state, dispatch] = useReducer(authReducer, authStateDefault);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        dispatch({ type: "login", payload: user });
+        // Al detectar un usuario logueado, cargar sus datos desde Firestore
+        const userDoc = await getDoc(doc(db, "Users", user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          dispatch({ type: "login", payload: { ...user, ...userData } });
+        } else {
+          dispatch({ type: "login", payload: user });
+        }
       }
     });
     return unsubscribe;
@@ -40,52 +46,50 @@ export function AuthProvider({ children }: any) {
         email,
         password
       );
-      const docRef = doc(db, "Users", userCredential.user.uid);
+      const user = userCredential.user;
+
+      // Obtener los datos adicionales del usuario desde Firestore
+      const docRef = doc(db, "Users", user.uid);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        console.log("Document data:", docSnap.data());
+        const userData = docSnap.data();
+        // Almacenar los datos del usuario en el estado
+        dispatch({ type: "login", payload: { ...user, ...userData } });
+        return true;
       } else {
         console.log("No such document!");
+        return false;
       }
-      return true;
     } catch (error: any) {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log("Error: ", {
-        errorCode,
-        errorMessage,
-      });
+      console.log("Error: ", error.message);
       return false;
     }
   };
 
-  const signUp = async (email: string, password: string, firstname:String, lastname: String): Promise<boolean> => {
+  const signUp = async (email: string, password: string, firstname: string, lastname: string): Promise<boolean> => {
     try {
       const response = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
-      // Obtener el UID del usuario recién creado
       const user = response.user;
       const uid = user.uid;
 
-      // Guardar los datos del usuario en Firestore
+      // Guardar los datos adicionales del usuario en Firestore
       await setDoc(doc(db, "Users", uid), {
         firstname,
         lastname,
         email,
       });
 
+      // Almacenar los datos del usuario en el estado
+      dispatch({ type: "login", payload: { uid, email, firstname, lastname } });
+
       return true;
     } catch (error: any) {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log("Error: ", {
-        errorCode,
-        errorMessage,
-      });
+      console.log("Error: ", error.message);
       return false;
     }
   };

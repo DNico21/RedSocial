@@ -1,11 +1,11 @@
-import { AuthProvider } from "@/context/AuthContext";
-import { DataProvider } from "@/context/dataContext";
+import { AuthProvider } from "@/context/authContext/AuthContext";
+import { DataProvider } from "@/context/dataContext/DataContext";
 import { Stack } from "expo-router";
 
 export default function IndexLayout() {
   return (
     <AuthProvider>
-      <DataProvider>
+      
         <Stack
           screenOptions={{
             headerShown: false,
@@ -17,7 +17,7 @@ export default function IndexLayout() {
           {/* Cuando el usuario se loggea */}
           <Stack.Screen name="(tabs)" />
         </Stack>
-      </DataProvider>
+    
     </AuthProvider>
   );
 }
