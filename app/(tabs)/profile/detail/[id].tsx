@@ -1,10 +1,10 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text } from "react-native";
+import React from "react";
 
-export default function id() {
+export default function Id() {
   return (
     <View>
-      <Text>id</Text>
+      <Text>ID Screen</Text>
     </View>
-  )
+  );
 }

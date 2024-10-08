@@ -1,5 +1,9 @@
+//AuthContext.tsx
 import { createContext, useEffect, useReducer } from "react";
-import {createUserWithEmailAndPassword, signInWithEmailAndPassword} from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { auth, db } from "@/utils/firebaseConfig";
 import { authReducer } from "./AuthReducer";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -14,8 +18,14 @@ const authStateDefault = {
 
 interface AuthContextProps {
   state: AuthState;
-  signUp: (email: string, password: string, firstname: string, lastname: string) => Promise<boolean>;
+  signUp: (
+    email: string,
+    password: string,
+    firstname: string,
+    lastname: string
+  ) => Promise<boolean>;
   signIn: (email: string, password: string) => Promise<boolean>;
+  updateUser: (updatedUser: any) => void;
 }
 
 export const AuthContext = createContext({} as AuthContextProps);
@@ -67,7 +77,30 @@ export function AuthProvider({ children }: any) {
     }
   };
 
-  const signUp = async (email: string, password: string, firstname: string, lastname: string): Promise<boolean> => {
+
+
+  const updateUser = async (updatedUser: any) => {
+    try {
+      // Verifica si el usuario está autenticado
+      if (!auth.currentUser) {
+        throw new Error("No hay un usuario autenticado");
+      }
+      const userRef = doc(db, "Users", auth.currentUser.uid); // Solo se ejecutará si hay un usuario autenticado
+      await setDoc(userRef, updatedUser, { merge: true }); // Actualiza los datos del usuario en Firestore
+      dispatch({ type: "updateUser", payload: updatedUser }); // Actualiza el estado en el contexto
+    } catch (error) {
+      console.error("Error updating user: ", error);
+    }
+  };
+
+
+  
+  const signUp = async (
+    email: string,
+    password: string,
+    firstname: string,
+    lastname: string
+  ): Promise<boolean> => {
     try {
       const response = await createUserWithEmailAndPassword(
         auth,
@@ -100,6 +133,7 @@ export function AuthProvider({ children }: any) {
         state,
         signIn,
         signUp,
+        updateUser, // Aquí exponemos la función para que otros componentes puedan usarla
       }}
     >
       {children}

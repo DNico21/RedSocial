@@ -1,5 +1,4 @@
 import { AuthProvider } from "@/context/authContext/AuthContext";
-import { DataProvider } from "@/context/dataContext/DataContext";
 import { Stack } from "expo-router";
 
 export default function IndexLayout() {

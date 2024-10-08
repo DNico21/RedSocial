@@ -6,26 +6,28 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Modal,
 } from "react-native";
 import { Link, useFocusEffect } from "expo-router";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "@/utils/firebaseConfig";
 import { useContext } from "react";
 import { AuthContext } from "@/context/authContext/AuthContext";
-
-
+import { useRouter } from "expo-router"; // Importar el hook useRouter
 
 export default function Profile() {
   const [posts, setPosts] = useState<string[]>([]);
   const { state } = useContext(AuthContext);
-  const { firstname, lastname } = state.user || { firstname: "", lastname: "" };
+  const { firstname, lastname, profileImage } = state.user || {
+    firstname: "",
+    lastname: "",
+    profileImage: "",
+  };
+
+  const router = useRouter(); // Hook para la navegación
+
+  // Estado para controlar la visibilidad del modal
+  const [isModalVisible, setModalVisible] = useState(false);
 
   // Función para cargar los posts del usuario
   const fetchUserPosts = async () => {
@@ -47,17 +49,41 @@ export default function Profile() {
     }, [])
   );
 
+  // Función para abrir el modal al hacer clic en la imagen de perfil
+  const handleProfileImagePress = () => {
+    setModalVisible(true);
+  };
+
+  // Función para cerrar el modal
+  const handleCloseModal = () => {
+    setModalVisible(false);
+  };
+
+  // Función para manejar clic en una publicación y redirigir a userPost
+  const handlePostImagePress = () => {
+    router.push("/(tabs)/profile/userPost");
+  };
+
   const renderPostImage = ({ item }: { item: string }) => (
-    <Image source={{ uri: item }} style={styles.postImage} />
+    <TouchableOpacity onPress={handlePostImagePress}>
+      <Image source={{ uri: item }} style={styles.postImage} />
+    </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
-        <Image
-          source={{ uri: "https://via.placeholder.com/80" }}
-          style={styles.profileImage}
-        />
+        {/* Touchable para la imagen de perfil */}
+        <TouchableOpacity onPress={handleProfileImagePress}>
+          <Image
+            source={
+              profileImage
+                ? { uri: profileImage }
+                : require("@/assets/images/adaptive-icon.png")
+            } // Mostrar imagen de perfil del usuario
+            style={styles.profileImage}
+          />
+        </TouchableOpacity>
 
         <View style={styles.textContainer}>
           <Text style={styles.username}>##</Text>
@@ -75,9 +101,10 @@ export default function Profile() {
         </View>
       </View>
 
+      {/* Mostrar el nombre del usuario */}
       <View style={styles.descrContainer}>
         <Text>
-          <Text>Nombre de usuario</Text>
+          {firstname} {lastname}
         </Text>
         <Text>Descripción</Text>
       </View>
@@ -95,6 +122,7 @@ export default function Profile() {
           </TouchableOpacity>
         </Link>
       </View>
+
       <View style={styles.publicacionesContainer}>
         <FlatList
           data={posts}
@@ -103,10 +131,26 @@ export default function Profile() {
           numColumns={3} // Muestra 3 columnas
         />
       </View>
+
+      {/* Modal para mostrar la imagen de perfil en grande */}
+      <Modal
+        visible={isModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={handleCloseModal}
+      >
+        <View style={styles.modalContainer}>
+          <TouchableOpacity onPress={handleCloseModal}>
+            <Image
+              source={profileImage ? { uri: profileImage } : require("@/assets/images/adaptive-icon.png")}
+              style={styles.modalProfileImage}
+            />
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -130,6 +174,12 @@ const styles = StyleSheet.create({
     borderRadius: 40, // Hace que la imagen sea circular
     marginRight: 20, // Espacio entre la imagen y el texto
     borderColor: "black",
+  },
+
+  modalProfileImage: {
+    width: 300, // Tamaño de la imagen en el modal
+    height: 300,
+    borderRadius: 150, // Hace que la imagen sea circular en el modal
   },
 
   textContainer: {
@@ -172,5 +222,12 @@ const styles = StyleSheet.create({
     height: 131, // Ajusta según tus necesidades
     margin: 0,
     aspectRatio: 1 / 1,
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.8)", // Fondo semitransparente para el modal
   },
 });

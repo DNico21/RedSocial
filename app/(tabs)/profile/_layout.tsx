@@ -6,6 +6,7 @@ export default function ProfileLayout() {
       <Stack.Screen name="index" options={{ title: "Instagram" }} />
       <Stack.Screen name="editprofile" options={{ title: "Editar Perfil" }} />
       <Stack.Screen name="configuration" options={{ title: "Ajustes" }} />
+      <Stack.Screen name="userPost" options={{ title: "Publicaciones" }} />
     </Stack>
   );
 }
