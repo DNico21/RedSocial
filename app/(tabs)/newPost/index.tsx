@@ -7,19 +7,21 @@ import ModalCamera from "@/components/ModalCamera";
 import { Image } from "expo-image";
 import * as Location from "expo-location";
 import { DataContext } from "@/context/dataContext/DataContext";
-
+import MapView, { Marker } from "react-native-maps";
 
 export default function NewPost() {
   const { newPost } = useContext(DataContext);
   const [isVisible, setIsVisble] = useState(false);
   const [currentPhoto, setCurrentPhoto] = useState(undefined as any);
   const [description, setDescription] = useState("");
-  const [location, setLocation] = useState(
-    null as Location.LocationObject | null
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null
   );
   const [successMessage, setSuccessMessage] = useState("");
   const [locationText, setLocationText] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [region, setRegion] = useState<any>(null); // Estado para la ubicación
+  const [showMap, setShowMap] = useState(false); // Nuevo estado para mostrar el mapa
 
   useEffect(() => {
     (async () => {
@@ -30,8 +32,15 @@ export default function NewPost() {
       }
 
       let location = await Location.getCurrentPositionAsync({});
-
       setLocation(location);
+
+      // Actualizamos la región del mapa con la ubicación actual
+      setRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
     })();
   }, []);
 
@@ -64,14 +73,13 @@ export default function NewPost() {
         image: currentPhoto.uri,
         date: new Date(),
       });
-      
+
       Alert.alert("Post creado con exito");
       // Si la operación fue exitosa, limpiamos los campos:
       setCurrentPhoto(undefined);
       setDescription("");
       setLocationText("");
     } catch (error) {
-      // Manejo de errores si ocurre algún problema al guardar el post.
       console.error("Error al guardar el post:", error);
       Alert.alert("Problema creando el post");
     }
@@ -126,6 +134,7 @@ export default function NewPost() {
           )}
         </View>
       </TouchableOpacity>
+
       <TextInput
         mode="outlined"
         multiline
@@ -139,8 +148,13 @@ export default function NewPost() {
           minHeight: 100,
         }}
       />
-      <TouchableOpacity onPress={getAddress}>
-        {/* <View> */}
+
+      <TouchableOpacity
+        onPress={() => {
+          getAddress();
+          setShowMap(true); // Aquí activamos la visualización del mapa
+        }}
+      >
         <View
           style={{
             flexDirection: "row",
@@ -161,11 +175,32 @@ export default function NewPost() {
           </View>
         </View>
         <Text>{locationText}</Text>
-        <Button onPress={handleSavePost}>
-          <Text>Guardar post</Text>
-        </Button>
-        {/* </View> */}
       </TouchableOpacity>
+
+      <Button onPress={handleSavePost}>
+        <Text>Guardar post</Text>
+      </Button>
+
+      {showMap && region && (
+        <View style={{ height: 300, marginVertical: 20 }}>
+          <MapView
+            style={{ flex: 1 }}
+            initialRegion={region}
+            showsUserLocation={true}
+          >
+            <Marker
+              coordinate={{
+                latitude: region.latitude,
+                longitude: region.longitude,
+              }}
+              title="Mi ubicación"
+              description="Aquí estoy"
+              draggable
+            />
+          </MapView>
+        </View>
+      )}
+
       <ModalCamera
         isVisible={isVisible}
         onSave={(photo) => {

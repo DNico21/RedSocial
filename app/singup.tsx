@@ -13,9 +13,16 @@ export default function SignUp() {
   const [lastname, setLastname] = useState("");
 
   const handleSignUp = async () => {
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(email)) {
+    Alert.alert("Error", "Por favor ingresa un correo electrónico válido");
+    return;
+  }
+
     if (password !== confirmPassword) {
       Alert.alert("Error", "Las contraseñas no coinciden");
-      router.replace("/(tabs)/home");
       return;
     }
 

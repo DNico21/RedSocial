@@ -1,17 +1,86 @@
-//search.tsx carpeta search
-import React from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  TextInput,
+  StyleSheet,
+  FlatList,
+  Text,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/utils/firebaseConfig'; // Importa tu configuración de Firebase
 
 export default function Search() {
+  const [searchTerm, setSearchTerm] = useState(''); // Término de búsqueda
+  const [users, setUsers] = useState<any[]>([]); // Lista de usuarios
+  const [filteredUsers, setFilteredUsers] = useState<any[]>([]); // Usuarios filtrados
+
+  // Obtener los usuarios de Firestore
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const querySnapshot = await getDocs(collection(db, 'Users'));
+      const usersList = querySnapshot.docs.map(doc => doc.data());
+      setUsers(usersList);
+      setFilteredUsers(usersList); // Inicialmente muestra todos los usuarios
+    };
+
+    fetchUsers();
+  }, []);
+
+  // Filtrar usuarios según el término de búsqueda
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = users.filter(user =>
+        `${user.firstname} ${user.lastname}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      );
+      setFilteredUsers(filtered);
+    } else {
+      setFilteredUsers(users); // Si no hay término de búsqueda, mostrar todos
+    }
+  }, [searchTerm, users]);
+
+
+
+  // Renderizar cada usuario en la lista
+  const renderUserItem = ({ item }: { item: any }) => (
+    <TouchableOpacity style={styles.userItem}>
+      <Image
+        source={
+          item.profileImage
+            ? { uri: item.profileImage }
+            : require('@/assets/images/adaptive-icon.png')
+        }
+        style={styles.profileImage}
+      />
+      <View style={styles.userInfo}>
+        <Text style={styles.userName}>
+          {item.firstname} {item.lastname}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
-      {/* Contenedor para el campo de Nombre de usuario */}
+      {/* Campo de búsqueda */}
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Buscar"
           style={styles.input}
+          value={searchTerm}
+          onChangeText={setSearchTerm} // Actualiza el término de búsqueda
         />
       </View>
+
+      {/* Lista de usuarios */}
+      <FlatList
+        data={filteredUsers} // Lista filtrada según la búsqueda
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={renderUserItem}
+      />
     </View>
   );
 }
@@ -32,5 +101,25 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
+  },
+  userItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
+  },
+  userInfo: {
+    flexDirection: 'column',
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

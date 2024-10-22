@@ -14,6 +14,7 @@ import { auth, db } from "@/utils/firebaseConfig";
 import { useContext } from "react";
 import { AuthContext } from "@/context/authContext/AuthContext";
 import { useRouter } from "expo-router"; // Importar el hook useRouter
+import { LinearGradient } from "expo-linear-gradient"; // Importar LinearGradient
 
 export default function Profile() {
   const [posts, setPosts] = useState<string[]>([]);
@@ -73,20 +74,25 @@ export default function Profile() {
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
-        {/* Touchable para la imagen de perfil */}
+        {/* Contenedor LinearGradient para la imagen de perfil */}
         <TouchableOpacity onPress={handleProfileImagePress}>
-          <Image
-            source={
-              profileImage
-                ? { uri: profileImage }
-                : require("@/assets/images/adaptive-icon.png")
-            } // Mostrar imagen de perfil del usuario
-            style={styles.profileImage}
-          />
+          <LinearGradient
+            colors={["#E012D0", "#E0D128"]} // Gradiente de colores (puedes personalizarlos)
+            style={styles.gradientContainer}
+          >
+            <Image
+              source={
+                profileImage
+                  ? { uri: profileImage }
+                  : require("@/assets/images/adaptive-icon.png")
+              } // Mostrar imagen de perfil del usuario
+              style={styles.profileImage}
+            />
+          </LinearGradient>
         </TouchableOpacity>
 
         <View style={styles.textContainer}>
-          <Text style={styles.username}>##</Text>
+          <Text style={styles.username}>{posts.length}</Text>
           <Text style={styles.username}>Publicaciones</Text>
         </View>
 
@@ -172,8 +178,17 @@ const styles = StyleSheet.create({
     width: 80, // Ancho de la imagen
     height: 80, // Alto de la imagen
     borderRadius: 40, // Hace que la imagen sea circular
-    marginRight: 20, // Espacio entre la imagen y el texto
-    borderColor: "black",
+    marginLeft: 5, // Espacio entre la imagen y el texto
+    borderColor: "#60FA1B",
+  },
+
+  gradientContainer: {
+    width: 90, // Tamaño del contenedor para que rodee la imagen de perfil
+    height: 90,
+    borderRadius: 45, // Hace que el contenedor también sea circular
+    alignItems: "flex-start",
+    justifyContent: "space-around",
+    marginRight: 20,
   },
 
   modalProfileImage: {
